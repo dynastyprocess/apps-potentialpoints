@@ -1,11 +1,10 @@
 library(shiny)
 library(shinyWidgets)
 library(bs4Dash)
-library(tidyverse)
+library(dplyr)
 library(ffscrapr)
 library(DT)
 library(waiter)
-library(tantastic)
 
 ui <- dashboardPage(
   dark = NULL,
