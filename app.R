@@ -5,6 +5,7 @@ library(dplyr)
 library(ffscrapr)
 library(DT)
 library(waiter)
+library(writexl)
 
 ui <- dashboardPage(
   dark = NULL,
@@ -17,6 +18,7 @@ ui <- dashboardPage(
     disable = TRUE
   ),
   body = dashboardBody(
+    includeCSS("dp.css"),
     waiter::useWaiter(),
     waiter::waiterOnBusy(html = waiter::spin_dots(),color = waiter::transparent(0.5)),
     box(
