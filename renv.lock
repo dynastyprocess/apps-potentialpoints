@@ -312,10 +312,15 @@
     },
     "ffscrapr": {
       "Package": "ffscrapr",
-      "Version": "1.4.6.04",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "fa77e36d273e4f26122d4d9d713eee95"
+      "Version": "1.4.6",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "ffscrapr",
+      "RemoteUsername": "ffverse",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "2f21816d3a81491d0bdf1f189f02357941f56bb3",
+      "Hash": "94c2c5f8c707274748c70987ca4b0b3e"
     },
     "fresh": {
       "Package": "fresh",
@@ -479,6 +484,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "a6b6d352e3ed897373ab19d8395c98d0"
+    },
+    "lubridate": {
+      "Package": "lubridate",
+      "Version": "1.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2ff5eedb6ee38fb1b81205c73be1be5a"
     },
     "magrittr": {
       "Package": "magrittr",
