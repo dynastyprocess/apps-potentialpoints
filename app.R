@@ -1,53 +1,83 @@
-library(shiny)
-library(shinyWidgets)
-library(bs4Dash)
-library(dplyr)
-library(ffscrapr)
-library(DT)
-library(waiter)
-library(writexl)
+suppressPackageStartupMessages({
+
+  library(shiny)
+  library(shinyWidgets)
+  library(shinyjs)
+  library(bs4Dash)
+  library(fresh)
+  library(dplyr)
+  library(ffscrapr)
+  library(DT)
+  library(waiter)
+  library(writexl)
+
+  options(dplyr.summarise.inform = FALSE)
+})
 
 ui <- dashboardPage(
   dark = NULL,
   header = dashboardHeader(
     h4("ESPN Potential Points Calculator", style = "color:#fff;"),
-    status = "danger",
+    title = dashboardBrand(
+      "DynastyProcess.com",
+      color = "gray-dark",
+      image = "https://raw.githubusercontent.com/dynastyprocess/graphics/main/.dynastyprocess/logohexonly.png"),
+    status = "gray-dark",
+    fixed = TRUE,
+    border = TRUE,
     skin = "dark"
   ),
   sidebar = dashboardSidebar(
-    disable = TRUE
+    skin = "dark",
+    sidebarMenu(
+      menuItem("Potential Points", icon = icon("calculator")),
+      tags$li(
+        tags$a(
+          icon("quidditch",class = "nav-icon", style = "font-size:1.1rem;"),
+          p("More by DynastyProcess"),
+          class = "nav-link",
+          href = "https://dynastyprocess.com"
+      ), class = "nav-item")
+    )
   ),
   body = dashboardBody(
     includeCSS("dp.css"),
     waiter::useWaiter(),
-    waiter::waiterOnBusy(html = waiter::spin_dots(),color = waiter::transparent(0.5)),
-    box(
-      title = "Inputs",
-      width = 4,
-      status = "gray-dark",
-      solidHeader = TRUE,
-      fluidRow(
-        column(
-          width = 12,
-          pickerInput("season",
-                      label = "Season",
-                      choices = 2021:2018,
-                      selected = 2021),
-          textInput("league_id",
-                    label = "League ID"),
-          tags$details(
-            tags$summary("Add Authentication Cookies"),
-            textInput("swid",
-                      label = "SWID"),
-            textInput("espn_s2",
-                      label = "ESPN S2"),
-            markdown("You can find the values for cookies by following these [instructions](https://ffscrapr.ffverse.com/articles/espn_authentication.html).")
+    waiter::waiterOnBusy(html = waiter::spin_dots(), color = waiter::transparent(0.5)),
+    shinyjs::useShinyjs(),
+    fluidRow(
+      box(
+        title = "Inputs",
+        width = 3,
+        status = "gray-dark",
+        solidHeader = TRUE,
+        fluidRow(
+          column(
+            width = 12,
+            pickerInput("season",
+                        label = "Season",
+                        choices = nflreadr:::most_recent_season():2018,
+                        selected = nflreadr:::most_recent_season()),
+            textInput("league_id",
+                      label = "League ID",
+                      value = "1178049"),
+            tags$details(
+              tags$summary("Add Authentication Cookies"),
+              textInput("swid",
+                        label = "SWID"),
+              textInput("espn_s2",
+                        label = "ESPN S2"),
+              markdown("You can find the values for cookies by following these [instructions](https://ffscrapr.ffverse.com/articles/espn_authentication.html).")
+            )
           )
-        )
+        ),
+        footer = div(
+          actionButton("load", label = "Calculate!"),
+          shinyjs::hidden(downloadButton("download", label = "Download")),
+          style = "text-align:center;")
       ),
-      footer = div(actionButton("load", label = "Calculate!", status = "success"),style = "text-align:center;")
-    ),
-    uiOutput("potential_points")
+      column(width = 9, uiOutput("potential_points"))
+    )
   )
 )
 
@@ -61,7 +91,6 @@ server <- function(input, output, session) {
     req(input$league_id)
 
     conn <- espn_connect(input$season,input$league_id, swid = input$swid, espn_s2 = input$espn_s2)
-    # conn <- espn_connect(season = 2021, league_id = 1178049)
 
     player_week <- espn_potentialpoints(conn)
 
@@ -96,6 +125,7 @@ server <- function(input, output, session) {
                            rownames = FALSE,
                            class = "compact stripe nowrap",
                            filter = "top",
+                           width = "100%",
                            options = list(scrollX = TRUE)
              )
              # tantastic::fmt_dtcol(x,c("franchise_score","optimal_score","efficiency"))
@@ -105,25 +135,28 @@ server <- function(input, output, session) {
   output$potential_points <- renderUI({
     req(potential_points())
 
+    shinyjs::show("download")
+
     player_week <- fn_tabPanel(potential_points()$week_details,"Week Details")
     week <- fn_tabPanel(potential_points()$week_summary,"Week Summary")
     season <- fn_tabPanel(potential_points()$season_summary,"Season Summary")
 
-    box(
+    tabBox(
       title = "Potential Points",
       side = "right",
       width = 12,
       status = "gray-dark",
       solidHeader = TRUE,
-      tabBox(
-        type = "pills",
-        width = 12,
-        player_week,
-        week,
-        season
-      ),
-      footer = div(downloadButton("download", status = "btn-success"), style = "text-align:center;")
+      type = "pills",
+      season,
+      week,
+      player_week
     )
+    # tagList(
+    #   season,
+    #   week,
+    #   player_week
+    # )
 
   })
 
