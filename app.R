@@ -1,10 +1,11 @@
+renv::load()
+
 suppressPackageStartupMessages({
 
   library(shiny)
   library(shinyWidgets)
   library(shinyjs)
   library(bs4Dash)
-  library(fresh)
   library(dplyr)
   library(ffscrapr)
   library(DT)
@@ -13,6 +14,7 @@ suppressPackageStartupMessages({
 
   options(dplyr.summarise.inform = FALSE)
 })
+
 
 ui <- dashboardPage(
   dark = NULL,
@@ -33,7 +35,7 @@ ui <- dashboardPage(
       menuItem("Potential Points", icon = icon("calculator")),
       tags$li(
         tags$a(
-          icon("quidditch",class = "nav-icon", style = "font-size:1.1rem;"),
+          icon("quidditch",class = "nav-icon"),
           p("More by DynastyProcess"),
           class = "nav-link",
           href = "https://dynastyprocess.com"
